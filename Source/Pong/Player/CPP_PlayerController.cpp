@@ -32,13 +32,6 @@ void ACPP_PlayerController::MoveRightLeft(float AxisValue)
 	{
 		float PaddleSpeed = Player->GetPaddleSpeed();
 
-		/*FVector DeltaLocation = FVector::ZeroVector;
-		DeltaLocation.Y = AxisValue * PaddleSpeed * GetWorld()->DeltaTimeSeconds;
-
-		Player->GetPaddelStaticMeshComponent()->AddLocalOffset(DeltaLocation, true);
-
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("Move"));*/
-
 		if (IsLocalController())
 		{
 			Server_MoveRightLeft(AxisValue, PaddleSpeed);
@@ -54,10 +47,8 @@ bool ACPP_PlayerController::Server_MoveRightLeft_Validate(float AxisValue, float
 {
 	return true;
 }
-
 void ACPP_PlayerController::Server_MoveRightLeft_Implementation(float AxisValue, float PaddleSpeed)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("Move Server!!!"));
 	Multi_MoveRightLeft(AxisValue, PaddleSpeed);
 }
 
@@ -65,13 +56,13 @@ bool ACPP_PlayerController::Multi_MoveRightLeft_Validate(float AxisValue, float 
 {
 	return true;
 }
-
 void ACPP_PlayerController::Multi_MoveRightLeft_Implementation(float AxisValue, float PaddleSpeed)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("Move Multi!!!"));
 	FVector DeltaLocation = FVector::ZeroVector;
 	DeltaLocation.Y = AxisValue * PaddleSpeed * GetWorld()->DeltaTimeSeconds;
+
 	Player = Cast<ACPP_Player>(GetPawn());
+
 	if (Player)
 	{
 		Player->GetPaddelStaticMeshComponent()->AddLocalOffset(DeltaLocation, true);

@@ -20,11 +20,7 @@ public:
 
 	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 
-	UFUNCTION()
-	void OnRep_BallVelocity();
-
 	void Restart();
-
 
 	FTimerHandle GetTimerHandleForSpawn() { return TimerHandleForSpawn; }
 	float GetTimeForSpawn() { return TimeForSpawn; }
@@ -40,14 +36,19 @@ protected:
 	void BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_Reflect(const FHitResult& Hit, const FVector Velocity);
-	bool Server_Reflect_Validate(const FHitResult& Hit, const FVector Velocity);
-	void Server_Reflect_Implementation(const FHitResult& Hit, const FVector Velocity);
+	void Server_Reflect(const FHitResult& Hit);
+	bool Server_Reflect_Validate(const FHitResult& Hit);
+	void Server_Reflect_Implementation(const FHitResult& Hit);
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UFUNCTION(NetMulticast, Reliable, WithValidation)
+	void Multi_Reflect(const FHitResult& Hit);
+	bool Multi_Reflect_Validate(const FHitResult& Hit);
+	void Multi_Reflect_Implementation(const FHitResult& Hit);
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated)
 	int32 CountRedGoal;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated)
 	int32 CountBlueGoal;
 
 private:
@@ -64,6 +65,7 @@ private:
 	UPROPERTY(Replicated)
 	FVector BallVelocity;
 
+	UPROPERTY(Replicated)
 	bool bGameOver = true;
 
 	FTimerHandle TimerHandleForSpawn;

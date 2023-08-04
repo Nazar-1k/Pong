@@ -10,8 +10,6 @@
 #include "../Wall/CPP_Wall.h"
 #include "../Goal/CPP_Goal.h"
 
-
-
 ACPP_Ball::ACPP_Ball()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
@@ -37,15 +35,10 @@ void ACPP_Ball::Tick(float DeltaTime)
 {
 	if (bGameOver == false)
 	{
-		FVector NewPosition = GetActorLocation() + BallVelocity * DeltaTime;
-		SetActorLocation(NewPosition);
-		
-		if (HasAuthority())
-		{
-		
-			OnRep_BallVelocity();
-		}
+		float InterpolationSpeed = 1.0f;
+		FVector NewPosition = FMath::VInterpTo(GetActorLocation(), GetActorLocation() + BallVelocity, DeltaTime, InterpolationSpeed);
 
+		SetActorLocation(NewPosition);
 	}
 	else
 	{
@@ -76,22 +69,27 @@ void ACPP_Ball::OnPaddleHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
 
 	if (PongWall || PongPlayer)
 	{
-		// Get the normal vector of the hit surface
-		FVector HitNormal = Hit.ImpactNormal;
+		//// Get the normal vector of the hit surface
+		//FVector HitNormal = Hit.ImpactNormal;
 
-		// Reflect the ball's velocity based on the hit normal
-		BallVelocity = BallVelocity - 2 * FVector::DotProduct(BallVelocity, HitNormal) * HitNormal;
+		//// Reflect the ball's velocity based on the hit normal
+		//BallVelocity = BallVelocity - 2 * FVector::DotProduct(BallVelocity, HitNormal) * HitNormal;
 
-		/*Server_Reflect(Hit, BallVelocity);*/
-
+		if (!HasAuthority())
+		{
+			Server_Reflect(Hit);
+		}
+		else
+		{
+			Multi_Reflect(Hit);
+		}
 	}
-
 }
 
 void ACPP_Ball::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	ACPP_Goal* Goal = Cast<ACPP_Goal>(OtherActor);
-	if (Goal)
+	if (Goal && !bGameOver)
 	{
 		bGameOver = true;
 
@@ -108,23 +106,28 @@ void ACPP_Ball::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* O
 	}
 }
 
-bool ACPP_Ball::Server_Reflect_Validate(const FHitResult& Hit, const FVector Velocity)
+bool ACPP_Ball::Server_Reflect_Validate(const FHitResult& Hit)
 {
 	return true;
 }
 
-void ACPP_Ball::Server_Reflect_Implementation(const FHitResult& Hit, const FVector Velocity)
+void ACPP_Ball::Server_Reflect_Implementation(const FHitResult& Hit)
+{
+	Multi_Reflect_Validate(Hit);
+}
+
+bool ACPP_Ball::Multi_Reflect_Validate(const FHitResult& Hit)
+{
+	return true;
+}
+
+void ACPP_Ball::Multi_Reflect_Implementation(const FHitResult& Hit)
 {
 	// Get the normal vector of the hit surface
 	FVector HitNormal = Hit.ImpactNormal;
 
 	// Reflect the ball's velocity based on the hit normal
 	BallVelocity = BallVelocity - 2 * FVector::DotProduct(BallVelocity, HitNormal) * HitNormal;
-}
-
-void ACPP_Ball::OnRep_BallVelocity()
-{
-	SetActorLocation(GetActorLocation() + BallVelocity * UGameplayStatics::GetWorldDeltaSeconds(this));
 }
 
 void ACPP_Ball::Restart()
@@ -144,6 +147,9 @@ void ACPP_Ball::Restart()
 void ACPP_Ball::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
+	
 	DOREPLIFETIME(ACPP_Ball, BallVelocity);
+	DOREPLIFETIME(ACPP_Ball, CountRedGoal);
+	DOREPLIFETIME(ACPP_Ball, CountBlueGoal);
+	DOREPLIFETIME(ACPP_Ball, bGameOver);
 }
