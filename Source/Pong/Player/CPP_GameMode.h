@@ -16,10 +16,15 @@ class PONG_API ACPP_GameMode : public AGameModeBase
 public:
 	
 	void StartGame();
-
+	
 protected:
 
+	virtual void BeginPlay() override;
+
 	virtual void PostLogin(APlayerController* NewPlayer) override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ball")
+	class ACPP_Ball* Ball;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	int32 RequiredLoadedPlayers = 2;

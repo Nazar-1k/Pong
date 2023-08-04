@@ -24,6 +24,10 @@ public:
 	void OnRep_BallVelocity();
 
 	void Restart();
+
+
+	FTimerHandle GetTimerHandleForSpawn() { return TimerHandleForSpawn; }
+	float GetTimeForSpawn() { return TimeForSpawn; }
 protected:
 
 	// Called when the game starts or when spawned

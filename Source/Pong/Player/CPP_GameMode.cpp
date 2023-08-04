@@ -3,11 +3,27 @@
 
 #include "CPP_GameMode.h"
 
-#include "GameFramework/PlayerState.h"
+#include "Kismet/GameplayStatics.h"
+
+#include "../Ball/CPP_Ball.h"
+
+
+void ACPP_GameMode::BeginPlay()
+{
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ACPP_Ball::StaticClass(), FoundActors);	
+
+	Ball = Cast<ACPP_Ball>(FoundActors[0]);
+}
 
 void ACPP_GameMode::StartGame()
 {
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("Start!!!"));
+	if (Ball)
+	{
+		FTimerHandle TimerHandle;
+		GetWorldTimerManager().SetTimer(TimerHandle, Ball, &ACPP_Ball::Restart, Ball->GetTimeForSpawn(), false);
+	}
 }
 
 void ACPP_GameMode::PostLogin(APlayerController* NewPlayer)

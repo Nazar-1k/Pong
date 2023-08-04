@@ -40,10 +40,9 @@ void ACPP_Ball::Tick(float DeltaTime)
 		FVector NewPosition = GetActorLocation() + BallVelocity * DeltaTime;
 		SetActorLocation(NewPosition);
 		
-		// –озсилаЇмо BallVelocity на вс≥х кл≥Їнт≥в
 		if (HasAuthority())
 		{
-			// якщо ми на сервер≥, то розсилаЇмо зм≥нений BallVelocity на вс≥х кл≥Їнт≥в
+		
 			OnRep_BallVelocity();
 		}
 
@@ -63,7 +62,6 @@ void ACPP_Ball::BeginPlay()
 
 	//Set Start Position and Velocity for Ball
 	SetActorLocation(FVector::ZeroVector);
-	GetWorldTimerManager().SetTimer(TimerHandleForSpawn, this, &ACPP_Ball::Restart, TimeForSpawn, false);
 
 	BallStaticMeshComponent->OnComponentHit.AddDynamic(this, &ACPP_Ball::OnPaddleHit);
 	BallStaticMeshComponent->OnComponentBeginOverlap.AddDynamic(this, &ACPP_Ball::BeginOverlap);
