@@ -36,9 +36,6 @@ ACPP_Player::ACPP_Player()
 	TopDownCameraComponent->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
 	bReplicates = true;
-
- 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
 }
 
 // Called when the game starts or when spawned
@@ -46,14 +43,9 @@ void ACPP_Player::BeginPlay()
 {
 
 	SetReplicateMovement(true);
+	
 
 	Super::BeginPlay();
 	
 }
 
-// Called every frame
-void ACPP_Player::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}

@@ -15,9 +15,7 @@ public:
 	// Sets default values for this pawn's properties
 	ACPP_Player();
 
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
+	UFUNCTION(BlueprintPure, BlueprintCallable)
 	float GetPaddleSpeed() { return PaddleSpeed ; }
 
 	UStaticMeshComponent* GetPaddelStaticMeshComponent() const { return PaddleStaticMeshComponent; }
